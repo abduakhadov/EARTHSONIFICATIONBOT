@@ -135,7 +135,12 @@ footer{text-align:center;color:var(--mute);font-size:12px;margin-top:30px;line-h
 .dock[hidden]{display:none}
 .dock .log{height:min(380px,50vh)}
 .dh{display:flex;justify-content:space-between;align-items:center;font-weight:700;margin-bottom:8px}
-.dh button{background:none;border:0;color:var(--mute);font-size:20px;cursor:pointer}
+.dh-actions{display:flex;align-items:center;gap:6px}
+.btn-clear-chat{display:none;align-items:center;gap:5px;background:none;border:1px solid var(--line);border-radius:999px;padding:3px 10px;font:inherit;font-size:12px;font-weight:600;color:var(--mute);cursor:pointer;transition:all .2s ease}
+.btn-clear-chat:hover{color:var(--red);border-color:var(--red);background:color-mix(in srgb,var(--red) 12%,transparent)}
+.btn-clear-chat:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
+.dh button#xdock{background:none;border:0;color:var(--mute);font-size:20px;cursor:pointer;line-height:1;padding:2px 6px;border-radius:6px}
+.dh button#xdock:hover{color:var(--ink)}
 .m.b{white-space:pre-wrap}
 .tg{display:inline-flex;align-items:center;gap:8px;margin-top:16px;padding:12px 22px;border-radius:999px;background:#229ed9;color:#fff;font-weight:700;font-size:14px;text-decoration:none;box-shadow:0 6px 24px #229ed955}
 .tg:hover{filter:brightness(1.1)}.tg:focus-visible{outline:3px solid var(--amber);outline-offset:2px}
@@ -198,7 +203,7 @@ footer{text-align:center;color:var(--mute);font-size:12px;margin-top:30px;line-h
 
 <button class="fab" id="fab" aria-expanded="false" aria-controls="dock"><span id="txt-fab">🤖 AI bilan gaplashish</span></button>
 <section class="bot dock" id="dock" hidden aria-label="AI yordamchi">
-<div class="dh"><span id="txt-dock-title">🤖 Yer yordamchisi</span><button id="xdock" aria-label="Yopish">×</button></div>
+<div class="dh"><span id="txt-dock-title">🤖 Yer yordamchisi</span><div class="dh-actions"><button type="button" class="btn-clear-chat" id="clearchat" aria-label="Tozalash" title="Chatni tozalash">🗑️ <span id="txt-clear-chat">Tozalash</span></button><button id="xdock" aria-label="Yopish">×</button></div></div>
 <div class="log" id="log" role="log" aria-live="polite"></div>
 <form class="send" id="botform"><input id="botin" placeholder="Istalgan savolni yozing..." aria-label="Savol"><button id="txt-bot-send">Yuborish</button></form>
 <a class="tg" id="txt-dock-tg" href="https://t.me/EarthsonificationBOT" target="_blank" rel="noopener noreferrer">✈️ Telegram botga o'tish</a>
@@ -242,6 +247,8 @@ const I18N = {
   how3: "<b>Xavf signali</b>Ko'rsatkich kritik darajaga yetganda fonda past ogohlantiruvchi tovush qo'shiladi.",
   fab: "🤖 AI bilan gaplashish",
   dockTitle: "🤖 Yer yordamchisi",
+  clearChat: "Tozalash",
+  clearChatTitle: "Chatni tozalash va yangidan yozish",
   close: "Yopish",
   botPlaceholder: "Istalgan savolni yozing...",
   botAria: "Savol",
@@ -286,6 +293,8 @@ const I18N = {
   how3: "<b>Danger Alarm</b>When an indicator crosses critical thresholds, an ominous warning pulse activates.",
   fab: "🤖 Chat with AI",
   dockTitle: "🤖 Earth Assistant",
+  clearChat: "Clear",
+  clearChatTitle: "Clear chat and start fresh",
   close: "Close",
   botPlaceholder: "Ask any question...",
   botAria: "Question",
@@ -330,6 +339,8 @@ const I18N = {
   how3: "<b>Сигнал тревоги</b>При критических значениях включается низкий тревожный пульсирующий тон.",
   fab: "🤖 Чат с ИИ",
   dockTitle: "🤖 Помощник Земли",
+  clearChat: "Очистить",
+  clearChatTitle: "Очистить чат и начать заново",
   close: "Закрыть",
   botPlaceholder: "Задайте любой вопрос...",
   botAria: "Вопрос",
@@ -525,10 +536,28 @@ function scrub(ev){const r=cv.getBoundingClientRect(),[s,e]=range();year=Math.ma
 cv.onpointerdown=e=>{drag=true;scrub(e)};cv.onpointermove=e=>{if(drag)scrub(e)};addEventListener('pointerup',()=>drag=false);addEventListener('resize',draw);
 
 // ===== Bot paneli =====
-const log=$('log');
+const log=$('log'),clearBtn=$('clearchat');
 function say(txt,who){const m=document.createElement('div');m.className='m '+who;m.textContent=txt;log.appendChild(m);log.scrollTop=log.scrollHeight;return m;}
 say(I18N[currentLang].botGreeting,'b');
 let hist=[],busy=false;
+
+function updateClearBtn(){
+ if(!clearBtn)return;
+ const hasMsgs=hist.length>0||(log&&log.querySelectorAll('.m').length>1);
+ clearBtn.style.display=hasMsgs?'inline-flex':'none';
+}
+function clearChat(){
+ hist=[];
+ busy=false;
+ if(log){
+  log.innerHTML='';
+  say(I18N[currentLang].botGreeting,'b');
+ }
+ updateClearBtn();
+ if($('botin')){$('botin').value='';$('botin').focus();}
+}
+if(clearBtn)clearBtn.onclick=clearChat;
+
 const ask=async q=>{
  const t=sel[0],valStr=(t.s[year]!=null?t.s[year].toFixed(t.dp)+' '+t.u:(currentLang==='uz'?"yo'q":currentLang==='ru'?"нет":"none"));
  const ctx=I18N[currentLang].botSys+I18N[currentLang].botCtx(t.nm,year,valStr);
@@ -551,13 +580,13 @@ const ask=async q=>{
   return (j.candidates&&j.candidates[0]&&j.candidates[0].content.parts.map(p=>p.text||'').join(''))||'';}
  const smp=window.claude&&await claude.use('sample');if(!smp)throw{code:'none'};
  return {stream:smp,turns};};
-$('botform').onsubmit=async e=>{e.preventDefault();const q=$('botin').value.trim();if(!q||busy)return;$('botin').value='';say(q,'u');busy=true;const w=say('...','b');
+$('botform').onsubmit=async e=>{e.preventDefault();const q=$('botin').value.trim();if(!q||busy)return;$('botin').value='';say(q,'u');busy=true;updateClearBtn();const w=say('...','b');
  try{const r=await ask(q);let out;
   if(typeof r==='string')out=r;else{const x=await r.stream(r.turns,{cache:false,onText:({text})=>{w.textContent=text;log.scrollTop=log.scrollHeight;}});out=x.text;}
   w.textContent=out||I18N[currentLang].botNoReply;hist.push({role:'assistant',content:out||''});}
  catch(err){hist.pop();const c=err&&err.code,loc=I18N[currentLang];
   w.textContent=c==='none'?loc.botErrNone:c==='not_granted'?loc.botErrNotGranted:c==='rate_limited'?loc.botErrRate:loc.botErrFail(err&&(err.detail||(err instanceof TypeError?loc.botErrNetwork:err.message))||loc.botErrUnknown);}
- busy=false;};
+ busy=false;updateClearBtn();};
 const dock=$('dock'),fab=$('fab');
 function tg(o){dock.hidden=!o;fab.setAttribute('aria-expanded',o);if(o)$('botin').focus();}
 fab.onclick=()=>tg(dock.hidden);$('xdock').onclick=()=>{tg(false);fab.focus();};
@@ -596,6 +625,11 @@ function applyLang(lang){
  if($('txt-how3'))$('txt-how3').innerHTML=d.how3;
  if($('txt-fab'))$('txt-fab').textContent=d.fab;
  if($('txt-dock-title'))$('txt-dock-title').textContent=d.dockTitle;
+ if($('txt-clear-chat'))$('txt-clear-chat').textContent=d.clearChat;
+ if($('clearchat')){
+  $('clearchat').setAttribute('aria-label',d.clearChat);
+  $('clearchat').title=d.clearChatTitle;
+ }
  if($('xdock'))$('xdock').setAttribute('aria-label',d.close);
  if($('botin')){
   $('botin').placeholder=d.botPlaceholder;
