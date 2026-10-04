@@ -1,12 +1,8 @@
-<!-- Avval config.js yuklanishi SHART -->
-<script src="config.js"></script>
-
-<!-- Keyin sizning asosiy kodingiz yozilgan fayl yuklanadi -->
-<script src="script.js"></script>
 <!DOCTYPE html>
 <html lang="uz">
 <head>
 <meta charset="utf-8">
+<script src="config.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>The Earth Information Jukebox</title>
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;800&display=swap" rel="stylesheet">
@@ -120,9 +116,9 @@ footer{text-align:center;color:var(--mute);font-size:12px;margin-top:30px;line-h
 <script>
 // ===== SOZLAMA: botingiz manzili. Bo'sh qolsa, bot "ulanmagan" deb javob beradi. =====
 const BOT_URL="";
-// ===== BEPUL AI: Google AI Studio kalitini shu yerga qo'ying (aistudio.google.com/apikey) =====
-
-
+// ===== BEPUL AI: Google AI Studio kalitini config.js ga qo'ying (aistudio.google.com/apikey) =====
+if (typeof GEMINI_KEY === 'undefined') var GEMINI_KEY = "";
+if (typeof GEMINI_MODEL === 'undefined') var GEMINI_MODEL = "gemini-3.5-flash-lite";
 // ===== MA'LUMOTLAR: [yil, qiymat] tayanch nuqtalar, oraliqlar to'ldiriladi =====
 // k: tovush turi, flip: qiymat kamaysa yomonlashadi (buzilish uchun)
 const T=[
@@ -173,7 +169,6 @@ function tone(f,type,dur,vol,o={}){const t0=ac.currentTime,os=ac.createOscillato
  if(o.dist){const w=ac.createWaveShaper();w.curve=curve(o.dist*60);out.connect(w);out=w;}
  out.connect(g);g.connect(master);g.gain.setValueAtTime(0,t0);g.gain.linearRampToValueAtTime(vol,t0+(o.atk||.015));g.gain.exponentialRampToValueAtTime(.001,t0+dur);
  os.start(t0);os.stop(t0+dur+.1);}
-function vol(v){return v;}
 function noise(dur,vl,hp){const t0=ac.currentTime,s=ac.createBufferSource(),f=ac.createBiquadFilter(),g=ac.createGain();s.buffer=nb;f.type='highpass';f.frequency.value=hp;s.connect(f);f.connect(g);g.connect(master);g.gain.setValueAtTime(vl,t0);g.gain.exponentialRampToValueAtTime(.001,t0+dur);s.start(t0);s.stop(t0+dur+.05);}
 function kick(v){const t0=ac.currentTime,o=ac.createOscillator(),g=ac.createGain();o.frequency.setValueAtTime(140,t0);o.frequency.exponentialRampToValueAtTime(40,t0+.15);o.connect(g);g.connect(master);g.gain.setValueAtTime(v,t0);g.gain.exponentialRampToValueAtTime(.001,t0+.2);o.start(t0);o.stop(t0+.25);}
 
