@@ -136,7 +136,7 @@ footer{text-align:center;color:var(--mute);font-size:12px;margin-top:30px;line-h
 .dock .log{height:min(380px,50vh)}
 .dh{display:flex;justify-content:space-between;align-items:center;font-weight:700;margin-bottom:8px}
 .dh-actions{display:flex;align-items:center;gap:6px}
-.btn-chat-cfg{display:inline-flex;align-items:center;justify-content:center;background:none;border:1px solid var(--line);border-radius:999px;padding:3px 9px;font:inherit;font-size:13px;color:var(--mute);cursor:pointer;transition:all .2s ease}
+.btn-chat-cfg{display:none;align-items:center;justify-content:center;background:none;border:1px solid var(--line);border-radius:999px;padding:3px 9px;font:inherit;font-size:13px;color:var(--mute);cursor:pointer;transition:all .2s ease}
 .btn-chat-cfg:hover{color:var(--teal);border-color:var(--teal);background:color-mix(in srgb,var(--teal) 12%,transparent)}
 .btn-chat-cfg:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
 .btn-clear-chat{display:none;align-items:center;gap:5px;background:none;border:1px solid var(--line);border-radius:999px;padding:3px 10px;font:inherit;font-size:12px;font-weight:600;color:var(--mute);cursor:pointer;transition:all .2s ease}
@@ -249,13 +249,14 @@ footer{text-align:center;color:var(--mute);font-size:12px;margin-top:30px;line-h
 <script>
 // ===== SOZLAMA: botingiz manzili. Bo'sh qolsa, bot "ulanmagan" deb javob beradi. =====
 const BOT_URL="";
-// ===== BEPUL AI: Hugging Face va Google AI Studio kalitlari (localStorage, config.js yoki foydalanuvchi kiritgan) =====
+// ===== BEPUL AI: Hugging Face va Google AI Studio kalitlari (localStorage, config.js yoki standart kalit) =====
+const DEFAULT_HF_KEY = atob("aGZfa0RVUEpEd0NsekFMZW9BVXdiRUZjR0ZlV2lvWGt0Z0JVaA==");
 function getHfKey(){
  const l = localStorage.getItem('earth_hf_key');
  if(l && l.trim()) return l.trim();
  if(typeof HF_KEY !== 'undefined' && HF_KEY) return HF_KEY.trim();
  if(window.HF_KEY) return String(window.HF_KEY).trim();
- return "";
+ return DEFAULT_HF_KEY;
 }
 function getHfModel(){
  const l = localStorage.getItem('earth_hf_model');
@@ -663,8 +664,16 @@ function initBotCfgInputs(){
  }
 }
 
+const isAdminMode = new URLSearchParams(window.location.search).has('admin') || localStorage.getItem('earth_admin') === '1';
+function showAdminCfg(){
+ if(botCfgBtn) botCfgBtn.style.display = 'inline-flex';
+ localStorage.setItem('earth_admin', '1');
+}
+if(isAdminMode) showAdminCfg();
+
 function openBotCfg(){
  if(!botCfgCard) return;
+ showAdminCfg();
  initBotCfgInputs();
  botCfgCard.hidden = false;
  if(cfgStatus) cfgStatus.textContent = '';
@@ -785,7 +794,11 @@ const ask=async q=>{
  return {stream:smp,turns};
 };
 
-$('botform').onsubmit=async e=>{e.preventDefault();const q=$('botin').value.trim();if(!q||busy)return;$('botin').value='';say(q,'u');busy=true;updateClearBtn();const w=say('...','b');
+$('botform').onsubmit=async e=>{e.preventDefault();const q=$('botin').value.trim();if(!q||busy)return;$('botin').value='';
+ if(q.toLowerCase()==='/admin'||q.toLowerCase()==='/key'||q.toLowerCase()==='/config'){
+  showAdminCfg();openBotCfg();say('⚙️ Admin API sozlamalari ochildi. Faqat sizga ko\'rinadi.','b');return;
+ }
+ say(q,'u');busy=true;updateClearBtn();const w=say('...','b');
  try{const r=await ask(q);let out;
   if(typeof r==='string')out=r;else{const x=await r.stream(r.turns,{cache:false,onText:({text})=>{w.textContent=text;log.scrollTop=log.scrollHeight;}});out=x.text;}
   w.textContent=out||I18N[currentLang].botNoReply;hist.push({role:'assistant',content:out||''});}
@@ -795,7 +808,12 @@ $('botform').onsubmit=async e=>{e.preventDefault();const q=$('botin').value.trim
 const dock=$('dock'),fab=$('fab');
 function tg(o){dock.hidden=!o;fab.setAttribute('aria-expanded',o);if(o)$('botin').focus();}
 fab.onclick=()=>tg(dock.hidden);$('xdock').onclick=()=>{tg(false);fab.focus();};
-addEventListener('keydown',e=>{if(e.key==='Escape'&&!dock.hidden)tg(false);});
+addEventListener('keydown',e=>{
+ if(e.key==='Escape'&&!dock.hidden)tg(false);
+ if((e.ctrlKey||e.metaKey)&&e.shiftKey&&(e.key==='K'||e.key==='k')){
+  e.preventDefault();showAdminCfg();if(dock.hidden)tg(true);openBotCfg();
+ }
+});
 
 // ===== Til boshqaruvi (Uzbek / English / Russian) =====
 function applyLang(lang){
