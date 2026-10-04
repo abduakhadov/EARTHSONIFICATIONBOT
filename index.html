@@ -210,7 +210,9 @@ footer{text-align:center;color:var(--mute);font-size:12px;margin-top:30px;line-h
 <script>
 // ===== SOZLAMA: botingiz manzili. Bo'sh qolsa, bot "ulanmagan" deb javob beradi. =====
 const BOT_URL="";
-// ===== BEPUL AI: Google AI Studio kalitini config.js ga qo'ying (aistudio.google.com/apikey) =====
+// ===== BEPUL AI: Hugging Face va Google AI Studio kalitlari =====
+const hfApiKey = (typeof HF_KEY !== 'undefined') ? HF_KEY : (window.HF_KEY || "");
+const hfModel = (typeof HF_MODEL !== 'undefined') ? HF_MODEL : (window.HF_MODEL || "Qwen/Qwen2.5-72B-Instruct");
 const geminiApiKey = (typeof GEMINI_KEY !== 'undefined') ? GEMINI_KEY : (window.GEMINI_KEY || "");
 const geminiModel = (typeof GEMINI_MODEL !== 'undefined') ? GEMINI_MODEL : (window.GEMINI_MODEL || "gemini-3.5-flash-lite");
 // ===== TIL VA TARJIMALAR (UZ / EN / RU) =====
@@ -532,6 +534,18 @@ const ask=async q=>{
  const ctx=I18N[currentLang].botSys+I18N[currentLang].botCtx(t.nm,year,valStr);
  hist.push({role:'user',content:q});const turns=hist.map((h,i)=>i===0?{role:'user',content:ctx+h.content}:h);
  if(BOT_URL){const r=await fetch(BOT_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:q,track:t.id,trackName:t.nm,year,value:t.s[year]??null,unit:t.u,lang:currentLang})});return (await r.json()).reply||'';}
+ if(hfApiKey){
+  try{
+   const msgs=[{role:'system',content:ctx},...hist.map(h=>({role:h.role,content:h.content}))];
+   const r=await fetch('https://router.huggingface.co/hf-inference/v1/chat/completions',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+hfApiKey},body:JSON.stringify({model:hfModel,messages:msgs,max_tokens:500,temperature:0.7})});
+   const j=await r.json().catch(()=>({}));
+   if(!r.ok)throw new Error(r.status+': '+((j.error&&(j.error.message||j.error))||I18N[currentLang].botErrUnknown));
+   if(j.choices&&j.choices[0]&&j.choices[0].message&&j.choices[0].message.content)return j.choices[0].message.content;
+  }catch(hfErr){
+   console.warn('Hugging Face xatosi, Gemini orqali urinib ko\'rilmoqda:',hfErr);
+   if(!geminiApiKey)throw{code:'fail',detail:hfErr.message||I18N[currentLang].botErrUnknown};
+  }
+ }
  if(geminiApiKey){const r=await fetch('https://generativelanguage.googleapis.com/v1beta/models/'+geminiModel+':generateContent',{method:'POST',headers:{'Content-Type':'application/json','x-goog-api-key':geminiApiKey},body:JSON.stringify({contents:turns.map(h=>({role:h.role==='assistant'?'model':'user',parts:[{text:h.content}]}))})});
   const j=await r.json().catch(()=>({}));if(!r.ok)throw{code:r.status===429?'rate_limited':'fail',detail:r.status+': '+((j.error&&j.error.message)||I18N[currentLang].botErrUnknown)};
   return (j.candidates&&j.candidates[0]&&j.candidates[0].content.parts.map(p=>p.text||'').join(''))||'';}
