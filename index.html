@@ -117,8 +117,8 @@ footer{text-align:center;color:var(--mute);font-size:12px;margin-top:30px;line-h
 // ===== SOZLAMA: botingiz manzili. Bo'sh qolsa, bot "ulanmagan" deb javob beradi. =====
 const BOT_URL="";
 // ===== BEPUL AI: Google AI Studio kalitini config.js ga qo'ying (aistudio.google.com/apikey) =====
-if (typeof GEMINI_KEY === 'undefined') var GEMINI_KEY = "";
-if (typeof GEMINI_MODEL === 'undefined') var GEMINI_MODEL = "gemini-3.5-flash-lite";
+const geminiApiKey = (typeof GEMINI_KEY !== 'undefined') ? GEMINI_KEY : (window.GEMINI_KEY || "");
+const geminiModel = (typeof GEMINI_MODEL !== 'undefined') ? GEMINI_MODEL : (window.GEMINI_MODEL || "gemini-3.5-flash-lite");
 // ===== MA'LUMOTLAR: [yil, qiymat] tayanch nuqtalar, oraliqlar to'ldiriladi =====
 // k: tovush turi, flip: qiymat kamaysa yomonlashadi (buzilish uchun)
 const T=[
@@ -227,7 +227,7 @@ let hist=[],busy=false;
 const ask=async q=>{const t=sel[0],ctx=SYS+' Hozir foydalanuvchi "'+t.nm+'" trekini ko\'rmoqda, yil: '+year+', qiymat: '+(t.s[year]!=null?t.s[year].toFixed(t.dp)+' '+t.u:"yo'q")+'.\n\n';
  hist.push({role:'user',content:q});const turns=hist.map((h,i)=>i===0?{role:'user',content:ctx+h.content}:h);
  if(BOT_URL){const r=await fetch(BOT_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:q,track:t.id,trackName:t.nm,year,value:t.s[year]??null,unit:t.u})});return (await r.json()).reply||'';}
- if(GEMINI_KEY){const r=await fetch('https://generativelanguage.googleapis.com/v1beta/models/'+GEMINI_MODEL+':generateContent',{method:'POST',headers:{'Content-Type':'application/json','x-goog-api-key':GEMINI_KEY},body:JSON.stringify({contents:turns.map(h=>({role:h.role==='assistant'?'model':'user',parts:[{text:h.content}]}))})});
+ if(geminiApiKey){const r=await fetch('https://generativelanguage.googleapis.com/v1beta/models/'+geminiModel+':generateContent',{method:'POST',headers:{'Content-Type':'application/json','x-goog-api-key':geminiApiKey},body:JSON.stringify({contents:turns.map(h=>({role:h.role==='assistant'?'model':'user',parts:[{text:h.content}]}))})});
   const j=await r.json().catch(()=>({}));if(!r.ok)throw{code:r.status===429?'rate_limited':'fail',detail:r.status+': '+((j.error&&j.error.message)||'noma\'lum xato')};
   return (j.candidates&&j.candidates[0]&&j.candidates[0].content.parts.map(p=>p.text||'').join(''))||'';}
  const smp=window.claude&&await claude.use('sample');if(!smp)throw{code:'none'};
