@@ -136,11 +136,35 @@ footer{text-align:center;color:var(--mute);font-size:12px;margin-top:30px;line-h
 .dock .log{height:min(380px,50vh)}
 .dh{display:flex;justify-content:space-between;align-items:center;font-weight:700;margin-bottom:8px}
 .dh-actions{display:flex;align-items:center;gap:6px}
+.btn-chat-cfg{display:inline-flex;align-items:center;justify-content:center;background:none;border:1px solid var(--line);border-radius:999px;padding:3px 9px;font:inherit;font-size:13px;color:var(--mute);cursor:pointer;transition:all .2s ease}
+.btn-chat-cfg:hover{color:var(--teal);border-color:var(--teal);background:color-mix(in srgb,var(--teal) 12%,transparent)}
+.btn-chat-cfg:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
 .btn-clear-chat{display:none;align-items:center;gap:5px;background:none;border:1px solid var(--line);border-radius:999px;padding:3px 10px;font:inherit;font-size:12px;font-weight:600;color:var(--mute);cursor:pointer;transition:all .2s ease}
 .btn-clear-chat:hover{color:var(--red);border-color:var(--red);background:color-mix(in srgb,var(--red) 12%,transparent)}
 .btn-clear-chat:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
 .dh button#xdock{background:none;border:0;color:var(--mute);font-size:20px;cursor:pointer;line-height:1;padding:2px 6px;border-radius:6px}
 .dh button#xdock:hover{color:var(--ink)}
+.bot-cfg-card{background:var(--input-bg);border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin-bottom:10px;display:flex;flex-direction:column;gap:8px;font-size:12px;box-shadow:inset 0 1px 3px rgba(0,0,0,0.12)}
+.bot-cfg-card[hidden]{display:none}
+.bot-cfg-title{display:flex;justify-content:space-between;align-items:center;font-weight:700;color:var(--ink);font-size:12.5px}
+.bot-cfg-desc{margin:0;color:var(--mute);font-size:11px;line-height:1.4}
+.bot-cfg-lbl{font-weight:600;color:var(--ink);margin-top:2px;display:flex;justify-content:space-between;align-items:center;font-size:11px}
+.bot-cfg-lbl a{color:var(--teal);text-decoration:none;font-weight:normal}
+.bot-cfg-lbl a:hover{text-decoration:underline}
+.bot-cfg-row{display:flex;gap:6px;align-items:center}
+.bot-cfg-row input{flex:1;background:var(--panel);border:1px solid var(--line);border-radius:8px;color:var(--ink);padding:6px 10px;font:inherit;font-size:12px}
+.bot-cfg-row input:focus{border-color:var(--teal);outline:none}
+.btn-toggle-eye{background:none;border:1px solid var(--line);border-radius:8px;padding:4px 8px;cursor:pointer;font-size:12px;color:var(--mute);transition:all .2s;line-height:1}
+.btn-toggle-eye:hover{color:var(--ink);border-color:var(--mute)}
+.bot-cfg-btns{display:flex;gap:8px;margin-top:4px}
+.btn-cfg-save{flex:1;border:0;border-radius:8px;padding:7px 12px;background:linear-gradient(135deg,var(--teal),var(--blue));color:#fff;font:inherit;font-weight:700;font-size:12px;cursor:pointer;transition:opacity .2s}
+.btn-cfg-save:hover{opacity:0.9}
+.btn-cfg-reset{border:1px solid var(--line);background:none;border-radius:8px;padding:7px 12px;color:var(--mute);font:inherit;font-size:12px;cursor:pointer;transition:all .2s}
+.btn-cfg-reset:hover{color:var(--red);border-color:var(--red)}
+.btn-close-sub{background:none;border:0;color:var(--mute);font-size:16px;cursor:pointer;padding:0 4px;line-height:1}
+.btn-close-sub:hover{color:var(--ink)}
+.bot-cfg-status{font-size:11px;min-height:14px;color:var(--green);font-weight:600;transition:all .2s}
+.bot-cfg-status.err{color:var(--red)}
 .m.b{white-space:pre-wrap}
 .tg{display:inline-flex;align-items:center;gap:8px;margin-top:16px;padding:12px 22px;border-radius:999px;background:#229ed9;color:#fff;font-weight:700;font-size:14px;text-decoration:none;box-shadow:0 6px 24px #229ed955}
 .tg:hover{filter:brightness(1.1)}.tg:focus-visible{outline:3px solid var(--amber);outline-offset:2px}
@@ -203,7 +227,17 @@ footer{text-align:center;color:var(--mute);font-size:12px;margin-top:30px;line-h
 
 <button class="fab" id="fab" aria-expanded="false" aria-controls="dock"><span id="txt-fab">🤖 AI bilan gaplashish</span></button>
 <section class="bot dock" id="dock" hidden aria-label="AI yordamchi">
-<div class="dh"><span id="txt-dock-title">🤖 Yer yordamchisi</span><div class="dh-actions"><button type="button" class="btn-clear-chat" id="clearchat" aria-label="Tozalash" title="Chatni tozalash">🗑️ <span id="txt-clear-chat">Tozalash</span></button><button id="xdock" aria-label="Yopish">×</button></div></div>
+<div class="dh"><span id="txt-dock-title">🤖 Yer yordamchisi</span><div class="dh-actions"><button type="button" class="btn-chat-cfg" id="botcfgbtn" aria-label="API Sozlamalari" title="API kalitini sozlash">⚙️</button><button type="button" class="btn-clear-chat" id="clearchat" aria-label="Tozalash" title="Chatni tozalash">🗑️ <span id="txt-clear-chat">Tozalash</span></button><button id="xdock" aria-label="Yopish">×</button></div></div>
+<div class="bot-cfg-card" id="botcfgcard" hidden>
+  <div class="bot-cfg-title"><span id="txt-cfg-head">⚙️ AI API sozlamalari</span><button type="button" class="btn-close-sub" id="botcfgclose" aria-label="Yopish">×</button></div>
+  <p class="bot-cfg-desc" id="txt-cfg-desc">API kaliti faqat sizning brauzeringizda (localStorage) xavfsiz saqlanadi.</p>
+  <label class="bot-cfg-lbl" for="cfg-hf"><span>Hugging Face Token:</span> <a href="https://huggingface.co/settings/tokens" target="_blank" rel="noopener noreferrer" id="txt-cfg-hf-link">bepul olish ↗</a></label>
+  <div class="bot-cfg-row"><input type="password" id="cfg-hf" placeholder="hf_..." autocomplete="off"><button type="button" class="btn-toggle-eye" id="eyehf" title="Ko'rsatish/yashirish">👁️</button></div>
+  <label class="bot-cfg-lbl" for="cfg-gemini"><span>Google Gemini Key:</span> <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer" id="txt-cfg-gemini-link">bepul olish ↗</a></label>
+  <div class="bot-cfg-row"><input type="password" id="cfg-gemini" placeholder="AIzaSy..." autocomplete="off"><button type="button" class="btn-toggle-eye" id="eyegemini" title="Ko'rsatish/yashirish">👁️</button></div>
+  <div class="bot-cfg-btns"><button type="button" class="btn-cfg-save" id="cfgsave">Saqlash</button><button type="button" class="btn-cfg-reset" id="cfgreset">Tozalash</button></div>
+  <div class="bot-cfg-status" id="cfgstatus"></div>
+</div>
 <div class="log" id="log" role="log" aria-live="polite"></div>
 <form class="send" id="botform"><input id="botin" placeholder="Istalgan savolni yozing..." aria-label="Savol"><button id="txt-bot-send">Yuborish</button></form>
 <a class="tg" id="txt-dock-tg" href="https://t.me/EarthsonificationBOT" target="_blank" rel="noopener noreferrer">✈️ Telegram botga o'tish</a>
@@ -215,11 +249,39 @@ footer{text-align:center;color:var(--mute);font-size:12px;margin-top:30px;line-h
 <script>
 // ===== SOZLAMA: botingiz manzili. Bo'sh qolsa, bot "ulanmagan" deb javob beradi. =====
 const BOT_URL="";
-// ===== BEPUL AI: Hugging Face va Google AI Studio kalitlari =====
-const hfApiKey = (typeof HF_KEY !== 'undefined') ? HF_KEY : (window.HF_KEY || "");
-const hfModel = (typeof HF_MODEL !== 'undefined') ? HF_MODEL : (window.HF_MODEL || "Qwen/Qwen2.5-72B-Instruct");
-const geminiApiKey = (typeof GEMINI_KEY !== 'undefined') ? GEMINI_KEY : (window.GEMINI_KEY || "");
-const geminiModel = (typeof GEMINI_MODEL !== 'undefined') ? GEMINI_MODEL : (window.GEMINI_MODEL || "gemini-3.5-flash-lite");
+// ===== BEPUL AI: Hugging Face va Google AI Studio kalitlari (localStorage, config.js yoki foydalanuvchi kiritgan) =====
+function getHfKey(){
+ const l = localStorage.getItem('earth_hf_key');
+ if(l && l.trim()) return l.trim();
+ if(typeof HF_KEY !== 'undefined' && HF_KEY) return HF_KEY.trim();
+ if(window.HF_KEY) return String(window.HF_KEY).trim();
+ return "";
+}
+function getHfModel(){
+ const l = localStorage.getItem('earth_hf_model');
+ if(l && l.trim()) return l.trim();
+ if(typeof HF_MODEL !== 'undefined' && HF_MODEL) return HF_MODEL.trim();
+ if(window.HF_MODEL) return String(window.HF_MODEL).trim();
+ return "Qwen/Qwen2.5-72B-Instruct";
+}
+function getGeminiKey(){
+ const l = localStorage.getItem('earth_gemini_key');
+ if(l && l.trim()) return l.trim();
+ if(typeof GEMINI_KEY !== 'undefined' && GEMINI_KEY) return GEMINI_KEY.trim();
+ if(window.GEMINI_KEY) return String(window.GEMINI_KEY).trim();
+ return "";
+}
+function getGeminiModel(){
+ const l = localStorage.getItem('earth_gemini_model');
+ if(l && l.trim()) return l.trim();
+ const m = (typeof GEMINI_MODEL !== 'undefined' && GEMINI_MODEL) ? GEMINI_MODEL : (window.GEMINI_MODEL || "");
+ if(m && m !== "gemini-3.5-flash-lite") return m.trim();
+ return "gemini-1.5-flash";
+}
+function hasAiKey(){
+ return !!(getHfKey() || getGeminiKey());
+}
+
 // ===== TIL VA TARJIMALAR (UZ / EN / RU) =====
 let currentLang = localStorage.getItem('lang') || 'uz';
 if(!['uz','en','ru'].includes(currentLang)) currentLang = 'uz';
@@ -250,6 +312,16 @@ const I18N = {
   clearChat: "Tozalash",
   clearChatTitle: "Chatni tozalash va yangidan yozish",
   close: "Yopish",
+  cfgBtnTitle: "AI API kalitlarini sozlash",
+  cfgHead: "⚙️ AI API sozlamalari",
+  cfgDesc: "API kaliti faqat sizning brauzeringizda (localStorage) xavfsiz saqlanadi va serverga chiqmaydi.",
+  cfgHfLbl: "Hugging Face Token:",
+  cfgGeminiLbl: "Google Gemini Key:",
+  cfgGetFree: "bepul olish ↗",
+  cfgSave: "Saqlash",
+  cfgReset: "Tozalash",
+  cfgSaved: "✅ Saqlandi! Endi AI bilan gaplashishingiz mumkin.",
+  cfgCleared: "Kalitlar tozalandi.",
   botPlaceholder: "Istalgan savolni yozing...",
   botAria: "Savol",
   botSend: "Yuborish",
@@ -261,10 +333,12 @@ const I18N = {
   warn: "⚠ Kritik daraja: ko'rsatkich xavfli qiymatga yetdi",
   cvAria: "Ma'lumot grafigi. Bosib yilni tanlang",
   botGreeting: "Salom! Men Yer yordamchisiman. Istalgan savol bering: iqlim, Yer, NASA yoki shu sayt haqida.",
+  botGreetingNoKey: "Salom! Men Yer yordamchisiman. AI ishlashi uchun yuqoridagi ⚙️ tugmasini bosib bepul Hugging Face yoki Gemini kalitingizni kiriting.",
   botSys: "Sen 'The Earth Information Jukebox' saytining AI yordamchisisan. Har qanday savolga foydalanuvchi tilida (asosan o'zbekcha) aniq, do'stona va qisqa javob ber. Iqlim, Yer, NASA va sonifikatsiya mavzularida ayniqsa kuchli bo'l.",
   botCtx: (nm, yr, val) => ` Hozir foydalanuvchi "${nm}" trekini ko'rmoqda, yil: ${yr}, qiymat: ${val}.\n\n`,
   botNoReply: "Javob olinmadi.",
   botErrNone: "AI hozir bu yerda mavjud emas. Telegram botimizga o'ting: @EarthsonificationBOT",
+  botErrNoKey: "AI kaliti kiritilmagan. Yuqoridagi ⚙️ tugmasini bosib Hugging Face yoki Gemini API kalitini kiriting.",
   botErrNotGranted: "AI ishlatishga ruxsat berilmadi.",
   botErrRate: "Juda tez-tez so'rov yuborildi. Birozdan keyin urinib ko'ring.",
   botErrFail: (det) => `AI ga ulanib bo'lmadi (${det}). Qayta urinib ko'ring.`,
@@ -296,6 +370,16 @@ const I18N = {
   clearChat: "Clear",
   clearChatTitle: "Clear chat and start fresh",
   close: "Close",
+  cfgBtnTitle: "Configure AI API keys",
+  cfgHead: "⚙️ AI API Settings",
+  cfgDesc: "API keys are securely stored only in your browser (localStorage).",
+  cfgHfLbl: "Hugging Face Token:",
+  cfgGeminiLbl: "Google Gemini Key:",
+  cfgGetFree: "get free ↗",
+  cfgSave: "Save",
+  cfgReset: "Reset",
+  cfgSaved: "✅ Saved! You can now chat with AI.",
+  cfgCleared: "Keys cleared.",
   botPlaceholder: "Ask any question...",
   botAria: "Question",
   botSend: "Send",
@@ -307,10 +391,12 @@ const I18N = {
   warn: "⚠ Critical level: indicator reached an alarming threshold",
   cvAria: "Data chart. Click or drag to pick a year",
   botGreeting: "Hello! I am your Earth Assistant. Ask me anything about climate, Earth data, NASA, or how this sonification works.",
+  botGreetingNoKey: "Hello! I am your Earth Assistant. To enable AI replies, click the ⚙️ icon above to provide a free Hugging Face or Gemini API key.",
   botSys: "You are the AI assistant for 'The Earth Information Jukebox'. Converse with the user in English clearly, helpfully, and concisely. You are an expert in climate science, Earth observation, NASA data, and sonification.",
   botCtx: (nm, yr, val) => ` Currently the user is viewing track "${nm}", year: ${yr}, value: ${val}.\n\n`,
   botNoReply: "No response received.",
   botErrNone: "AI is currently not available here. Visit our Telegram bot: @EarthsonificationBOT",
+  botErrNoKey: "No AI key provided. Click ⚙️ above to enter your Hugging Face or Gemini API key.",
   botErrNotGranted: "AI permission not granted.",
   botErrRate: "Too many requests. Please try again shortly.",
   botErrFail: (det) => `Could not connect to AI (${det}). Please try again.`,
@@ -342,6 +428,16 @@ const I18N = {
   clearChat: "Очистить",
   clearChatTitle: "Очистить чат и начать заново",
   close: "Закрыть",
+  cfgBtnTitle: "Настройка API ключей",
+  cfgHead: "⚙️ Настройки API ИИ",
+  cfgDesc: "API ключи безопасно сохраняются только в вашем браузере (localStorage).",
+  cfgHfLbl: "Hugging Face Token:",
+  cfgGeminiLbl: "Google Gemini Key:",
+  cfgGetFree: "получить бесплатно ↗",
+  cfgSave: "Сохранить",
+  cfgReset: "Очистить",
+  cfgSaved: "✅ Сохранено! Теперь можно общаться с ИИ.",
+  cfgCleared: "Ключи очищены.",
   botPlaceholder: "Задайте любой вопрос...",
   botAria: "Вопрос",
   botSend: "Отправить",
@@ -353,10 +449,12 @@ const I18N = {
   warn: "⚠ Критический уровень: показатель достиг опасного значения",
   cvAria: "График данных. Нажмите или потяните для выбора года",
   botGreeting: "Здравствуйте! Я ИИ-помощник Земли. Спросите меня о климате, планете, данных NASA или сонификации.",
+  botGreetingNoKey: "Здравствуйте! Я ИИ-помощник Земли. Для включения ответов ИИ укажите бесплатный ключ Hugging Face или Gemini, нажав ⚙️ вверху.",
   botSys: "Ты ИИ-помощник интерактивного проекта 'The Earth Information Jukebox'. Отвечай пользователю на русском языке четко, дружелюбно и кратко. Ты эксперт в климате, экологии, данных NASA и сонификации.",
   botCtx: (nm, yr, val) => ` Сейчас пользователь просматривает трек "${nm}", год: ${yr}, значение: ${val}.\n\n`,
   botNoReply: "Ответ не получен.",
   botErrNone: "ИИ сейчас недоступен здесь. Перейдите в наш Telegram-бот: @EarthsonificationBOT",
+  botErrNoKey: "Ключ ИИ не указан. Нажмите ⚙️ выше, чтобы ввести ключ Hugging Face или Gemini.",
   botErrNotGranted: "Доступ к ИИ не предоставлен.",
   botErrRate: "Слишком частые запросы. Попробуйте чуть позже.",
   botErrFail: (det) => `Не удалось подключиться к ИИ (${det}). Попробуйте снова.`,
@@ -535,11 +633,104 @@ function draw(){const r=cv.getBoundingClientRect(),d=devicePixelRatio||1;
 function scrub(ev){const r=cv.getBoundingClientRect(),[s,e]=range();year=Math.max(s,Math.min(e,Math.round(s+(ev.clientX-r.left)/r.width*(e-s))));audio();sel.forEach(t=>{if(year>=t.a&&year<=t.b)voice(t,year)});update();}
 cv.onpointerdown=e=>{drag=true;scrub(e)};cv.onpointermove=e=>{if(drag)scrub(e)};addEventListener('pointerup',()=>drag=false);addEventListener('resize',draw);
 
-// ===== Bot paneli =====
+// ===== Bot paneli va API sozlamalari =====
 const log=$('log'),clearBtn=$('clearchat');
+const botCfgBtn=$('botcfgbtn'),botCfgCard=$('botcfgcard'),botCfgClose=$('botcfgclose');
+const cfgHf=$('cfg-hf'),cfgGemini=$('cfg-gemini'),cfgSave=$('cfgsave'),cfgReset=$('cfgreset'),cfgStatus=$('cfgstatus');
+const eyeHf=$('eyehf'),eyeGemini=$('eyegemini');
+
 function say(txt,who){const m=document.createElement('div');m.className='m '+who;m.textContent=txt;log.appendChild(m);log.scrollTop=log.scrollHeight;return m;}
-say(I18N[currentLang].botGreeting,'b');
+
+function getInitialBotGreeting(){
+ const loc = I18N[currentLang] || I18N.uz;
+ return hasAiKey() ? loc.botGreeting : loc.botGreetingNoKey;
+}
+say(getInitialBotGreeting(),'b');
 let hist=[],busy=false;
+
+function initBotCfgInputs(){
+ if(cfgHf){
+  const k = localStorage.getItem('earth_hf_key') || '';
+  cfgHf.value = k;
+  if(!k && (typeof HF_KEY !== 'undefined' && HF_KEY)) cfgHf.placeholder = 'config.js faol (hf_...)';
+  else cfgHf.placeholder = 'hf_...';
+ }
+ if(cfgGemini){
+  const k = localStorage.getItem('earth_gemini_key') || '';
+  cfgGemini.value = k;
+  if(!k && (typeof GEMINI_KEY !== 'undefined' && GEMINI_KEY)) cfgGemini.placeholder = 'config.js faol';
+  else cfgGemini.placeholder = 'AIzaSy...';
+ }
+}
+
+function openBotCfg(){
+ if(!botCfgCard) return;
+ initBotCfgInputs();
+ botCfgCard.hidden = false;
+ if(cfgStatus) cfgStatus.textContent = '';
+ if(cfgHf) cfgHf.focus();
+}
+
+function closeBotCfg(){
+ if(botCfgCard) botCfgCard.hidden = true;
+}
+
+if(botCfgBtn) botCfgBtn.onclick = () => {
+ if(botCfgCard.hidden) openBotCfg();
+ else closeBotCfg();
+};
+if(botCfgClose) botCfgClose.onclick = closeBotCfg;
+
+function toggleEye(input, btn){
+ if(!input) return;
+ const isPwd = input.type === 'password';
+ input.type = isPwd ? 'text' : 'password';
+ btn.textContent = isPwd ? '🙈' : '👁️';
+}
+if(eyeHf) eyeHf.onclick = () => toggleEye(cfgHf, eyeHf);
+if(eyeGemini) eyeGemini.onclick = () => toggleEye(cfgGemini, eyeGemini);
+
+if(cfgSave) cfgSave.onclick = () => {
+ const hfVal = (cfgHf ? cfgHf.value : '').trim();
+ const gemVal = (cfgGemini ? cfgGemini.value : '').trim();
+ if(hfVal) localStorage.setItem('earth_hf_key', hfVal);
+ else localStorage.removeItem('earth_hf_key');
+ if(gemVal) localStorage.setItem('earth_gemini_key', gemVal);
+ else localStorage.removeItem('earth_gemini_key');
+
+ if(cfgStatus){
+  cfgStatus.className = 'bot-cfg-status';
+  cfgStatus.textContent = I18N[currentLang].cfgSaved;
+ }
+ setTimeout(()=>{
+  if(cfgStatus) cfgStatus.textContent = '';
+  closeBotCfg();
+ }, 1400);
+
+ if(log && log.querySelectorAll('.m').length === 1){
+  const first = log.querySelector('.m.b');
+  if(first) first.textContent = getInitialBotGreeting();
+ }
+};
+
+if(cfgReset) cfgReset.onclick = () => {
+ localStorage.removeItem('earth_hf_key');
+ localStorage.removeItem('earth_gemini_key');
+ if(cfgHf) cfgHf.value = '';
+ if(cfgGemini) cfgGemini.value = '';
+ if(cfgStatus){
+  cfgStatus.className = 'bot-cfg-status';
+  cfgStatus.textContent = I18N[currentLang].cfgCleared;
+ }
+ setTimeout(()=>{
+  if(cfgStatus) cfgStatus.textContent = '';
+ }, 1400);
+
+ if(log && log.querySelectorAll('.m').length === 1){
+  const first = log.querySelector('.m.b');
+  if(first) first.textContent = getInitialBotGreeting();
+ }
+};
 
 function updateClearBtn(){
  if(!clearBtn)return;
@@ -551,7 +742,7 @@ function clearChat(){
  busy=false;
  if(log){
   log.innerHTML='';
-  say(I18N[currentLang].botGreeting,'b');
+  say(getInitialBotGreeting(),'b');
  }
  updateClearBtn();
  if($('botin')){$('botin').value='';$('botin').focus();}
@@ -563,29 +754,43 @@ const ask=async q=>{
  const ctx=I18N[currentLang].botSys+I18N[currentLang].botCtx(t.nm,year,valStr);
  hist.push({role:'user',content:q});const turns=hist.map((h,i)=>i===0?{role:'user',content:ctx+h.content}:h);
  if(BOT_URL){const r=await fetch(BOT_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:q,track:t.id,trackName:t.nm,year,value:t.s[year]??null,unit:t.u,lang:currentLang})});return (await r.json()).reply||'';}
- if(hfApiKey){
+
+ const hfKey = getHfKey();
+ const hfM = getHfModel();
+ const geminiKey = getGeminiKey();
+ const geminiM = getGeminiModel();
+
+ if(hfKey){
   try{
    const msgs=[{role:'system',content:ctx},...hist.map(h=>({role:h.role,content:h.content}))];
-   const r=await fetch('https://router.huggingface.co/hf-inference/v1/chat/completions',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+hfApiKey},body:JSON.stringify({model:hfModel,messages:msgs,max_tokens:500,temperature:0.7})});
+   const r=await fetch('https://router.huggingface.co/hf-inference/v1/chat/completions',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+hfKey},body:JSON.stringify({model:hfM,messages:msgs,max_tokens:500,temperature:0.7})});
    const j=await r.json().catch(()=>({}));
    if(!r.ok)throw new Error(r.status+': '+((j.error&&(j.error.message||j.error))||I18N[currentLang].botErrUnknown));
    if(j.choices&&j.choices[0]&&j.choices[0].message&&j.choices[0].message.content)return j.choices[0].message.content;
   }catch(hfErr){
    console.warn('Hugging Face xatosi, Gemini orqali urinib ko\'rilmoqda:',hfErr);
-   if(!geminiApiKey)throw{code:'fail',detail:hfErr.message||I18N[currentLang].botErrUnknown};
+   if(!geminiKey)throw{code:'fail',detail:hfErr.message||I18N[currentLang].botErrUnknown};
   }
  }
- if(geminiApiKey){const r=await fetch('https://generativelanguage.googleapis.com/v1beta/models/'+geminiModel+':generateContent',{method:'POST',headers:{'Content-Type':'application/json','x-goog-api-key':geminiApiKey},body:JSON.stringify({contents:turns.map(h=>({role:h.role==='assistant'?'model':'user',parts:[{text:h.content}]}))})});
+ if(geminiKey){
+  const r=await fetch('https://generativelanguage.googleapis.com/v1beta/models/'+geminiM+':generateContent',{method:'POST',headers:{'Content-Type':'application/json','x-goog-api-key':geminiKey},body:JSON.stringify({contents:turns.map(h=>({role:h.role==='assistant'?'model':'user',parts:[{text:h.content}]}))})});
   const j=await r.json().catch(()=>({}));if(!r.ok)throw{code:r.status===429?'rate_limited':'fail',detail:r.status+': '+((j.error&&j.error.message)||I18N[currentLang].botErrUnknown)};
-  return (j.candidates&&j.candidates[0]&&j.candidates[0].content.parts.map(p=>p.text||'').join(''))||'';}
- const smp=window.claude&&await claude.use('sample');if(!smp)throw{code:'none'};
- return {stream:smp,turns};};
+  return (j.candidates&&j.candidates[0]&&j.candidates[0].content.parts.map(p=>p.text||'').join(''))||'';
+ }
+ const smp=window.claude&&await claude.use('sample');
+ if(!smp){
+  openBotCfg();
+  throw{code:'no_key'};
+ }
+ return {stream:smp,turns};
+};
+
 $('botform').onsubmit=async e=>{e.preventDefault();const q=$('botin').value.trim();if(!q||busy)return;$('botin').value='';say(q,'u');busy=true;updateClearBtn();const w=say('...','b');
  try{const r=await ask(q);let out;
   if(typeof r==='string')out=r;else{const x=await r.stream(r.turns,{cache:false,onText:({text})=>{w.textContent=text;log.scrollTop=log.scrollHeight;}});out=x.text;}
   w.textContent=out||I18N[currentLang].botNoReply;hist.push({role:'assistant',content:out||''});}
  catch(err){hist.pop();const c=err&&err.code,loc=I18N[currentLang];
-  w.textContent=c==='none'?loc.botErrNone:c==='not_granted'?loc.botErrNotGranted:c==='rate_limited'?loc.botErrRate:loc.botErrFail(err&&(err.detail||(err instanceof TypeError?loc.botErrNetwork:err.message))||loc.botErrUnknown);}
+  w.textContent=c==='no_key'?loc.botErrNoKey:c==='none'?loc.botErrNone:c==='not_granted'?loc.botErrNotGranted:c==='rate_limited'?loc.botErrRate:loc.botErrFail(err&&(err.detail||(err instanceof TypeError?loc.botErrNetwork:err.message))||loc.botErrUnknown);}
  busy=false;updateClearBtn();};
 const dock=$('dock'),fab=$('fab');
 function tg(o){dock.hidden=!o;fab.setAttribute('aria-expanded',o);if(o)$('botin').focus();}
@@ -625,6 +830,16 @@ function applyLang(lang){
  if($('txt-how3'))$('txt-how3').innerHTML=d.how3;
  if($('txt-fab'))$('txt-fab').textContent=d.fab;
  if($('txt-dock-title'))$('txt-dock-title').textContent=d.dockTitle;
+ if($('botcfgbtn')){
+  $('botcfgbtn').setAttribute('aria-label',d.cfgHead);
+  $('botcfgbtn').title=d.cfgBtnTitle;
+ }
+ if($('txt-cfg-head'))$('txt-cfg-head').textContent=d.cfgHead;
+ if($('txt-cfg-desc'))$('txt-cfg-desc').textContent=d.cfgDesc;
+ if($('txt-cfg-hf-link'))$('txt-cfg-hf-link').textContent=d.cfgGetFree;
+ if($('txt-cfg-gemini-link'))$('txt-cfg-gemini-link').textContent=d.cfgGetFree;
+ if($('cfgsave'))$('cfgsave').textContent=d.cfgSave;
+ if($('cfgreset'))$('cfgreset').textContent=d.cfgReset;
  if($('txt-clear-chat'))$('txt-clear-chat').textContent=d.clearChat;
  if($('clearchat')){
   $('clearchat').setAttribute('aria-label',d.clearChat);
@@ -647,7 +862,7 @@ function applyLang(lang){
  });
  if(log){
   const firstBot=log.querySelector('.m.b');
-  if(firstBot&&log.children.length===1)firstBot.textContent=d.botGreeting;
+  if(firstBot&&log.children.length===1)firstBot.textContent=getInitialBotGreeting();
  }
  refresh();
 }
